@@ -4,9 +4,12 @@
   "description": "",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": "15.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "babel-nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -27,5 +30,9 @@
     "uuid": "^9.0.1",
     "validator": "^13.11.0",
     "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3"
   }
 }
