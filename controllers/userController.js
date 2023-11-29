@@ -638,39 +638,45 @@ export const suggestedFriends = async (req, res) => {
         const existingRequest = await FriendRequest.find({
             $or: [{ fromUser: userId }, { toUser: userId }],
         });
+        
+        // Fetch friends and friend requests of the user
+        const user = await Users.findById(userId);
+        const userFriends = user.friends || [];
+        const userFriendRequests = user.friendRequests || [];
 
-        if (!existingRequest || existingRequest.length === 0) {
-            // Fetch friends and friend requests of the user
-            const user = await Users.findById(userId);
-            const userFriends = user.friends || [];
-            const userFriendRequests = user.friendRequests || [];
+        // Extract user IDs involved in existing friend requests
+        const existingRequestUserIds = existingRequest.reduce((ids, request) => {
+            if (request.fromUser.toString() === userId) {
+                ids.push(request.toUser);
+            } else {
+                ids.push(request.fromUser);
+            }
+            return ids;
+        }, []);
 
-            // Create the query object
-            const queryObject = {
-                _id: { $ne: userId },
-                friends: { $nin: [...userFriends, ...userFriendRequests] },
-            };
+        // Create the query object
+        const queryObject = {
+            _id: {
+                $ne: userId,
+                $nin: [...userFriends, ...userFriendRequests, ...existingRequestUserIds],
+            },
+        };
 
-            // Execute the query and limit the result to 10 users
-            const queryResult = await Users.find(queryObject)
-                .limit(10)
-                .select("firstName lastName userName profilePicUrl friendRequests -password");
+        // Execute the query and limit the result to 10 users
+        const queryResult = await Users.find(queryObject)
+            .sort({createdAt: -1})
+            .limit(10)
+            .select("firstName lastName userName profilePicUrl friendRequests -password");
 
-            // Get suggested friends from the query result
-            const suggestedFriends = queryResult;
+        // Get suggested friends from the query result
+        const suggestedFriends = queryResult;
 
-            // Return a success response with the suggested friends
-            res.json({
-                success: true,
-                data: suggestedFriends,
-            });
-        } else {
-            // If there are existing friend requests, handle it accordingly
-            res.json({
-                success: true,
-                data: [], // You might want to adjust this based on your logic
-            });
-        }
+        // Return a success response with the suggested friends
+        res.json({
+            success: true,
+            data: suggestedFriends,
+        });
+
     } catch (error) {
         console.log(error);
 

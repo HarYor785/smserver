@@ -80,19 +80,31 @@ export const getPosts = async (req, res) => {
             return friends?.includes(post?.userId?._id.toString());
         });
 
-        // Filtering posts that are not from friends
-        const otherPosts = posts?.filter((post) => {
-            return !friends?.includes(post?.userId?._id.toString());
-        });
+        //filter friends posts
+        const friendsPosts = posts.filter(post => friends.includes(post.userId._id.toString()) && post.userId._id.toString() !== userId);
+
+        //Filter user posts
+        const userPosts = posts?.filter((post)=>{
+            return post.userId._id.toString() === userId
+        })
+
+        //Prioritize user's posts created within the last hour
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+        const recentUserPosts = userPosts.filter((post)=> post.createdAt > oneHourAgo) 
 
         let postResult = null;
 
-        // Concatenating friends' posts and other posts based on search condition
-        if (friendsPost.length > 0) {
-            postResult = search ? friendsPost : [...friendsPost, ...otherPosts];
-        } else {
-            postResult = posts;
-        }
+        if(recentUserPosts.length > 0){
+            // Separate posts that are not part of recentUserPosts
+            const postsNotInRecentUser = posts.filter(post => !recentUserPosts.includes(post));
+            postResult = [...recentUserPosts, ...postsNotInRecentUser]
+        }else if(friendsPost.length > 0){
+            // Separate posts that are not part of friendsPosts
+            const postsNotInFriendsAndRecent = posts.filter(post => !friendsPosts.includes(post) && !recentUserPosts.includes(post));
+            postResult = search ? friendsPost : [...recentUserPosts, ...friendsPosts, ...postsNotInFriendsAndRecent]
+        }else{
+            postResult = posts
+        } 
 
         // Sending a successful response with the fetched posts
         res.status(200).json({
