@@ -24,7 +24,7 @@ export const signupMailVerification = async (user, res)=>{
     const {_id, email, lastName} = user
 
     const token = _id + uuidv4()
-    const link = `${APP_URL}verify/${_id}/${token}`
+    const link = `${APP_URL}/verify/${_id}/${token}`
 
     const mailOption = {
         from: "ConnectMe",
@@ -94,7 +94,7 @@ export const resetPasswordLink = async (user, res)=>{
     try {
         const {_id, email} = user
         const token = _id + uuidv4()
-        const link = `${APP_URL}password-link/${_id}/${token}`
+        const link = `${APP_URL}/password-link/${_id}/${token}`
 
         const mailOption = {
             from: "ConnectMe",

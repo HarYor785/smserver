@@ -33,6 +33,9 @@ const userSchema = new mongoose.Schema(
                 message: "Date of birth should not be after today",
             }
         },
+        gender: {
+            type: String,
+        },
         mobile:{type: String,},
         location: {type: String},
         profession: {type: String},

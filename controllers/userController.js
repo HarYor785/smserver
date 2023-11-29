@@ -44,7 +44,7 @@ export const verifyAccount = async (req, res) => {
 
                 return res.json({
                     success: true,
-                    message: "Email verified successfully",
+                    message: "Email verified successfully, You can now proceed to login",
                 });
             } else {
                 return res.json({
@@ -256,6 +256,7 @@ export const updateProfile = async (req, res) => {
             email,
             userName,
             mobile,
+            gender,
             location,
             bio,
             profession,
@@ -274,7 +275,7 @@ export const updateProfile = async (req, res) => {
                 message: "Please provide required fields"
             });
         }
-
+        console.log(gender)
         // Create an object with updated profile information
         const updateProfile = {
             firstName,
@@ -283,6 +284,7 @@ export const updateProfile = async (req, res) => {
             email,
             mobile,
             location,
+            gender,
             bio,
             profession,
             dateOfBirth,
