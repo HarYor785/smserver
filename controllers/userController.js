@@ -371,7 +371,8 @@ export const sendFriendRequest = async (req, res) => {
         // Return a success response
         res.status(200).json({
             success: true,
-            message: 'Friend request sent'
+            message: 'Friend request sent',
+            data: newRequest
         });
 
     } catch (error) {
